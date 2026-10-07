@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbit of Love - Constellation Timeline</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Playfair+Display:ital,wght@0,400;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #050306;
+            --rose-gold: #f2c4ce;
+            --rose-accent: #e27d8e;
+            --rose-deep: #b84a5c;
+            --soft-white: #fff5f7;
+            --gold-sheen: #fbe3d2;
+            --glow-color: rgba(226, 125, 142, 0.45);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--soft-white);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            cursor: default;
+        }
+
+        /* Interactive Spotlight Canvas */
+        #spotlight {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+            background: radial-gradient(
+                600px circle at var(--mouse-x, 50vw) var(--mouse-y, 50vh),
+                rgba(226, 125, 142, 0.12),
+                transparent 70%
+            );
+        }
+
+        /* Ambient background glow points */
+        .bg-glow {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(80px);
+            opacity: 0.25;
+            animation: pulseGlow 10s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.15; transform: scale(0.9); }
+            100% { opacity: 0.35; transform: scale(1.2); }
+        }
+
+        header {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Smooth Layered Heading Morph Effect */
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            letter-spacing: 0.2em;
+            margin-bottom: 0.4rem;
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+            text-align: center;
+            padding: 0 0.5rem;
+        }
+
+        /* Default Visible Title Text */
+        h1 .title-text {
+            display: block;
+            background: linear-gradient(135deg, #ffffff 0%, var(--rose-gold) 50%, var(--rose-accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(226, 125, 142, 0.4);
+            transition: opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Hover Overlay Text for Title */
+        h1 .hover-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 2.1rem;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+            background: linear-gradient(135deg, var(--gold-sheen) 0%, var(--rose-gold) 50%, #ff3366 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0;
+            transform: scale(0.92);
+            transition: opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease;
+            pointer-events: none;
+            filter: drop-shadow(0 0 10px rgba(226, 125, 142, 0.2));
+        }
+
+        h1:hover .title-text {
+            opacity: 0;
+            transform: scale(0.92);
+            filter: blur(4px);
+        }
+
+        h1:hover .hover-text {
+            opacity: 1;
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 20px rgba(226, 125, 142, 0.8));
+        }
+
+        /* Subtitle Morphing */
+        p.subtitle {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 0.95rem;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+            text-align: center;
+            min-height: 1.4em;
+        }
+
+        p.subtitle .title-text {
+            display: block;
+            color: var(--rose-gold);
+            opacity: 0.85;
+            transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease;
+        }
+
+        p.subtitle .hover-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold-sheen);
+            white-space: nowrap;
+            opacity: 0;
+            transform: scale(0.92);
+            transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease;
+            pointer-events: none;
+            text-shadow: 0 0 12px var(--rose-accent);
+        }
+
+        p.subtitle:hover .title-text {
+            opacity: 0;
+            transform: scale(0.92);
+            filter: blur(2px);
+        }
+
+        p.subtitle:hover .hover-text {
+            opacity: 1;
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 12px var(--rose-accent));
+        }
+
+        .counter-badge {
+            margin-top: 0.8rem;
+            display: inline-block;
+            padding: 0.35rem 1.1rem;
+            background: rgba(242, 196, 206, 0.06);
+            border: 1px solid rgba(242, 196, 206, 0.2);
+            border-radius: 30px;
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
+            color: var(--rose-gold);
+            backdrop-filter: blur(10px);
+            pointer-events: none;
+        }
+
+        #viewport {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 2;
+        }
+
+        /* Floating Date Capsule */
+        .date-capsule {
+            position: absolute;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 0.9rem;
+            background: rgba(18, 10, 15, 0.65);
+            border: 1px solid rgba(242, 196, 206, 0.22);
+            border-radius: 50px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            color: var(--soft-white);
+            cursor: pointer;
+            user-select: none;
+            will-change: transform, opacity;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, background 0.3s ease;
+        }
+
+        .date-capsule .heart {
+            color: var(--rose-accent);
+            font-size: 0.9rem;
+            transition: transform 0.3s ease, color 0.3s ease;
+            filter: drop-shadow(0 0 6px var(--rose-accent));
+        }
+
+        /* Hidden hover detail badge */
+        .date-capsule::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            background: rgba(25, 12, 18, 0.92);
+            border: 1px solid var(--rose-accent);
+            color: var(--gold-sheen);
+            padding: 0.35rem 0.75rem;
+            border-radius: 12px;
+            font-family: 'Playfair Display', serif;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            box-shadow: 0 0 15px rgba(226, 125, 142, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .date-capsule:hover {
+            background: rgba(35, 18, 25, 0.85);
+            border-color: var(--rose-gold);
+            box-shadow: 0 0 25px var(--glow-color);
+            transform: scale(1.15) !important;
+            z-index: 9999 !important;
+            animation-play-state: paused !important;
+        }
+
+        .date-capsule:hover .heart {
+            color: #ff3366;
+            transform: scale(1.35);
+        }
+
+        .date-capsule:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @keyframes floatOrbit {
+            0% {
+                opacity: 0;
+                transform: translate(0, 0) scale(0.8) rotate(0deg);
+            }
+            12% {
+                opacity: 0.9;
+            }
+            88% {
+                opacity: 0.9;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--moveX), var(--moveY)) scale(var(--endScale)) rotate(var(--rotateDeg));
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="spotlight"></div>
+
+    <header>
+        <h1>
+            <span class="title-text">Orbit of Love</span>
+            <span class="hover-text">I love you mera kaju ♥</span>
+        </h1>
+        <p class="subtitle">
+            <span class="title-text">Every single day is written in the stars</span>
+            <span class="hover-text">I love you mera kaju ♥</span>
+        </p>
+        <div class="counter-badge" id="counter">Gathering dates...</div>
+    </header>
+
+    <!-- Glowing ambient background lights -->
+    <div class="bg-glow" style="width: 300px; height: 300px; top: 15%; left: 20%; background: var(--rose-accent);"></div>
+    <div class="bg-glow" style="width: 400px; height: 400px; top: 60%; left: 70%; background: var(--rose-gold); animation-delay: -5s;"></div>
+
+    <main id="viewport"></main>
+
+    <script>
+        // Track spotlight position
+        window.addEventListener('mousemove', (e) => {
+            document.body.style.setProperty('--mouse-x', `${e.clientX}px`);
+            document.body.style.setProperty('--mouse-y', `${e.clientY}px`);
+        });
+
+        function getOrdinal(day) {
+            if (day >= 11 && day <= 13) return `${day}th`;
+            const suffixes = {1: 'st', 2: 'nd', 3: 'rd'};
+            return `${day}${suffixes[day % 10] || 'th'}`;
+        }
+
+        function generateTimelineData() {
+            const startDate = new Date(2023, 1, 7); // Feb 7, 2023
+            const endDate = new Date(); // Today
+            const dates = [];
+
+            const monthAbbrs = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const monthFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            let currentDate = new Date(startDate);
+
+            while (currentDate <= endDate) {
+                const day = currentDate.getDate();
+                const dayOrd = getOrdinal(day);
+                const monthAbbr = monthAbbrs[currentDate.getMonth()];
+                const monthName = monthFull[currentDate.getMonth()];
+                const year = currentDate.getFullYear();
+
+                const formattedDay = day < 10 ? `0${day}` : `${day}`;
+
+                dates.push({
+                    compactText: `${formattedDay} ${monthAbbr} ${year}`,
+                    fullText: `I loved you on -> ${dayOrd} ${monthName.toLowerCase()} ${year} then,`
+                });
+
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            return dates;
+        }
+
+        function initConstellation() {
+            const viewport = document.getElementById('viewport');
+            const dataPool = generateTimelineData();
+            
+            document.getElementById('counter').textContent = `${dataPool.length} Days • ${dataPool[0].compactText} → Today`;
+
+            const maxSimultaneousCapsules = 32;
+            let currentIndex = 0;
+
+            function spawnCapsule() {
+                if (dataPool.length === 0) return;
+
+                const item = dataPool[currentIndex];
+                currentIndex = (currentIndex + 1) % dataPool.length;
+
+                const capsule = document.createElement('div');
+                capsule.className = 'date-capsule';
+                capsule.setAttribute('data-tooltip', item.fullText);
+
+                const dateSpan = document.createElement('span');
+                dateSpan.textContent = item.compactText;
+
+                const heartSpan = document.createElement('span');
+                heartSpan.className = 'heart';
+                heartSpan.innerHTML = '♥';
+
+                capsule.appendChild(dateSpan);
+                capsule.appendChild(heartSpan);
+
+                // Initial position anywhere across the main central region
+                const startX = Math.random() * 70 + 15; // 15vw to 85vw
+                const startY = Math.random() * 70 + 15; // 15vh to 85vh
+
+                capsule.style.left = `${startX}vw`;
+                capsule.style.top = `${startY}vh`;
+
+                // Vector drift motion parameters
+                const moveX = (Math.random() - 0.5) * 45; // -22.5vw to +22.5vw drift
+                const moveY = (Math.random() - 0.5) * 45; // -22.5vh to +22.5vh drift
+                const endScale = Math.random() * 0.4 + 0.85; // Depth scaling (0.85 to 1.25)
+                const rotateDeg = (Math.random() - 0.5) * 14; // Subtle angle shift
+
+                capsule.style.setProperty('--moveX', `${moveX}vw`);
+                capsule.style.setProperty('--moveY', `${moveY}vh`);
+                capsule.style.setProperty('--endScale', `${endScale}`);
+                capsule.style.setProperty('--rotateDeg', `${rotateDeg}deg`);
+
+                // Staggered motion timings
+                const duration = Math.random() * 8 + 12; // 12s to 20s travel duration
+                capsule.style.animation = `floatOrbit ${duration}s cubic-bezier(0.25, 1, 0.5, 1) forwards`;
+
+                viewport.appendChild(capsule);
+
+                // Recycle capsule when animation reaches end
+                setTimeout(() => {
+                    if (capsule.parentNode) {
+                        capsule.parentNode.removeChild(capsule);
+                    }
+                    spawnCapsule();
+                }, duration * 1000);
+            }
+
+            // Spawn initial cluster with staggered delays
+            for (let i = 0; i < maxSimultaneousCapsules; i++) {
+                setTimeout(() => {
+                    spawnCapsule();
+                }, i * 450);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', initConstellation);
+    </script>
+</body>
+</html>
